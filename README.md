@@ -1,2 +1,2 @@
 # CRI
-Continous Rust Integrator: A Continous Integration system in Rust
+Continuous Rust Integrator: A Continuous Integration system in Rust
