@@ -21,7 +21,7 @@ fn main() {
 
     println!("{}", args.dispatcher_server);
 
-    let Some((dhost, dport)) = args.dispatcher_server.split_once(":") else { panic!() };
+    let Some((dhost, dport)) = args.dispatcher_server.split_once(":") else { panic!("Could not read server:port") };
     
 
     println!("host: {}, port: {}", dhost, dport);
