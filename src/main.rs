@@ -1,9 +1,10 @@
 use clap::Parser;
 use std::fs::File;
 use std::io::{self, Read};
-use std::path::Path;
 use std::process::Command;
 use std::{thread, time};
+use std::net::TcpStream;
+use std::io::prelude::*;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -57,6 +58,14 @@ fn main() {
         };
 
         println!("commit id: {}", commit_id);
-        break;
-    }
+        if let Ok(mut stream) = TcpStream::connect(&args.dispatcher_server){
+            let data = stream.write(b"status\n").expect("Could not send status command to server");
+            let mut resp = String::new();
+            stream.read_to_string(&mut resp).expect("Could not read status response from server");
+            print!("server resp: {}", resp);
+        } else {
+            println!("Could not connect to server");
+        }
+        
+   }
 }
