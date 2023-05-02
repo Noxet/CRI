@@ -57,15 +57,24 @@ fn main() {
             }
         };
 
+        // TODO: maybe loop this if something fails, as we want to try with the current commit
+        // before leaving it
+        //for _ in 1..=3 {
+        let mut resp = String::new();
         println!("commit id: {}", commit_id);
         if let Ok(mut stream) = TcpStream::connect(&args.dispatcher_server){
-            let data = stream.write(b"status\n").expect("Could not send status command to server");
-            let mut resp = String::new();
+            stream.write(b"status\n").expect("Could not send status command to server");
             stream.read_to_string(&mut resp).expect("Could not read status response from server");
             print!("server resp: {}", resp);
+            if resp == "ok" {
+                stream.write(format!("dispatch:{}", commit_id).as_bytes()).expect("Could not send commit ID to dispatch");
+            }
         } else {
-            println!("Could not connect to server");
+            println!("Could not connect to server, trying again later...");
+            thread::sleep(time::Duration::from_secs(60));
+            continue;
         }
-        
+
+        //}
    }
 }

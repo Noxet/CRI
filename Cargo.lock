@@ -112,11 +112,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 
 [[package]]
-name = "cri"
+name = "dispatcher"
 version = "0.1.0"
-dependencies = [
- "clap",
-]
 
 [[package]]
 name = "errno"
@@ -185,6 +182,13 @@ name = "linux-raw-sys"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b64f40e5e03e0d54f03845c8197d0291253cdbedfb1cb46b13c2c117554a9f4c"
+
+[[package]]
+name = "observer"
+version = "0.1.0"
+dependencies = [
+ "clap",
+]
 
 [[package]]
 name = "once_cell"
