@@ -1,10 +1,10 @@
 use clap::Parser;
 use std::fs::File;
+use std::io::prelude::*;
 use std::io::{self, Read};
+use std::net::TcpStream;
 use std::process::Command;
 use std::{thread, time};
-use std::net::TcpStream;
-use std::io::prelude::*;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -49,7 +49,7 @@ fn main() {
 
         let commit_id = match get_commit_id() {
             Ok(cid) => cid,
-            Err(_) => { 
+            Err(_) => {
                 println!("Failed to get commit id, trying later...");
                 // TODO: add sleep here
                 thread::sleep(time::Duration::from_secs(5));
@@ -62,12 +62,18 @@ fn main() {
         //for _ in 1..=3 {
         let mut resp = String::new();
         println!("commit id: {}", commit_id);
-        if let Ok(mut stream) = TcpStream::connect(&args.dispatcher_server){
-            stream.write_all(b"status\n").expect("Could not send status command to server");
-            stream.read_to_string(&mut resp).expect("Could not read status response from server");
+        if let Ok(mut stream) = TcpStream::connect(&args.dispatcher_server) {
+            stream
+                .write_all(b"status\n")
+                .expect("Could not send status command to server");
+            stream
+                .read_to_string(&mut resp)
+                .expect("Could not read status response from server");
             print!("server resp: {}", resp);
             if resp == "ok" {
-                stream.write_all(format!("dispatch:{}", commit_id).as_bytes()).expect("Could not send commit ID to dispatch");
+                stream
+                    .write_all(format!("dispatch:{}", commit_id).as_bytes())
+                    .expect("Could not send commit ID to dispatch");
             }
         } else {
             println!("Could not connect to server, trying again later...");
@@ -76,5 +82,5 @@ fn main() {
         }
 
         //}
-   }
+    }
 }
