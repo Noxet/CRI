@@ -28,7 +28,7 @@ fn get_commit_id() -> Result<String, io::Error> {
 
     match f.read_to_string(&mut commit_id) {
         Ok(_) => Ok(commit_id),
-        Err(e) => return Err(e),
+        Err(e) => Err(e),
     }
 }
 
@@ -37,7 +37,7 @@ fn main() {
 
     println!("{}", args.dispatcher_server);
 
-    let Some((dhost, dport)) = args.dispatcher_server.split_once(":") else { panic!("Could not read server:port") };
+    let Some((dhost, dport)) = args.dispatcher_server.split_once(':') else { panic!("Could not read server:port") };
     dbg!(dhost, dport);
 
     loop {
@@ -63,11 +63,11 @@ fn main() {
         let mut resp = String::new();
         println!("commit id: {}", commit_id);
         if let Ok(mut stream) = TcpStream::connect(&args.dispatcher_server){
-            stream.write(b"status\n").expect("Could not send status command to server");
+            stream.write_all(b"status\n").expect("Could not send status command to server");
             stream.read_to_string(&mut resp).expect("Could not read status response from server");
             print!("server resp: {}", resp);
             if resp == "ok" {
-                stream.write(format!("dispatch:{}", commit_id).as_bytes()).expect("Could not send commit ID to dispatch");
+                stream.write_all(format!("dispatch:{}", commit_id).as_bytes()).expect("Could not send commit ID to dispatch");
             }
         } else {
             println!("Could not connect to server, trying again later...");
