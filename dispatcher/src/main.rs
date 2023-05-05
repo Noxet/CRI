@@ -6,6 +6,8 @@ use std::net::{TcpListener, TcpStream};
 use std::process::Command;
 use std::{thread, time};
 
+use utils::ThreadPool;
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -20,11 +22,12 @@ fn main() {
     println!("{}", args.server);
 
     let listener = TcpListener::bind(args.server).unwrap();
+    let pool = ThreadPool::new(16);
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
 
-        handle_connection(stream);
+        pool.execute(|| {handle_connection(stream)});
     }
 }
 
@@ -37,4 +40,7 @@ fn handle_connection(mut stream: TcpStream) {
         .collect();
 
     println!("Request: {:#?}", http_req);
+    thread::sleep(time::Duration::from_secs(10));
+    let response = "HTTP/1.1 200 OK\r\n\r\n<html>hej</html>";
+    stream.write_all(response.as_bytes()).unwrap();
 }
