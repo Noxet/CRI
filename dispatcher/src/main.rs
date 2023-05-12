@@ -1,10 +1,8 @@
 use clap::Parser;
-use std::fs::File;
 use std::io::prelude::*;
-use std::io::{self, BufReader, Read};
+use std::io::BufReader;
 use std::net::{TcpListener, TcpStream};
-use std::process::Command;
-use std::{thread, time};
+use regex::Regex;
 
 use utils::ThreadPool;
 
@@ -40,7 +38,19 @@ fn handle_connection(mut stream: TcpStream) {
         .collect();
 
     println!("Request: {:#?}", http_req);
-    thread::sleep(time::Duration::from_secs(10));
-    let response = "HTTP/1.1 200 OK\r\n\r\n<html>hej</html>";
-    stream.write_all(response.as_bytes()).unwrap();
+    let re = Regex::new(r"(\w+)(:.+)*").unwrap();
+    let cap = re.captures(http_req[0].as_str()).unwrap();
+    println!("cap: {:#?}", cap.get(1));
+
+    let cmd = cap.get(1).map_or("", |m| m.as_str());
+    println!("cmd: {}", cmd);
+
+    if cmd.eq("status") {
+        println!("Got status");
+        stream.write_all("OK".as_bytes()).unwrap();
+    } else if cmd.eq("register") {
+        println!("Got register");
+        // TODO: add runner
+        stream.write_all("OK".as_bytes()).unwrap();
+    }
 }
