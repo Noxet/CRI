@@ -29,17 +29,34 @@ fn main() {
     }
 }
 
+struct Runner {
+    host: String,
+    port: String,
+}
+
+struct Server {
+    stream: TcpStream,
+    runners: Vec<Runner>,
+    commits: Vec<String>,
+}
+
 fn handle_connection(mut stream: TcpStream) {
     let buf_reader = BufReader::new(&mut stream);
+    let mut req = String::new();
+    //buf_reader.read_line(&mut req);
+    buf_reader.take(1024).read_line(&mut req).expect("Could not read data");
+    println!("Request: {:#?}", req);
+
+    /*
     let http_req: Vec<_> = buf_reader
         .lines()
         .map(|result| result.unwrap())
         .take_while(|line| !line.is_empty())
         .collect();
+*/
 
-    println!("Request: {:#?}", http_req);
-    let re = Regex::new(r"(\w+)(:.+)*").unwrap();
-    let cap = re.captures(http_req[0].as_str()).unwrap();
+    let re = Regex::new(r"(\w+):?(.+)*").unwrap();
+    let cap = re.captures(req.as_str()).unwrap();
     println!("cap: {:#?}", cap.get(1));
 
     let cmd = cap.get(1).map_or("", |m| m.as_str());

@@ -70,7 +70,7 @@ fn main() {
                 .read_to_string(&mut resp)
                 .expect("Could not read status response from server");
             print!("server resp: {}", resp);
-            if resp == "ok" {
+            if resp == "OK" {
                 stream
                     .write_all(format!("dispatch:{}", commit_id).as_bytes())
                     .expect("Could not send commit ID to dispatch");
